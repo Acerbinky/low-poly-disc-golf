@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="color-scheme" content="light dark" />
+  <link rel="icon" href="data:," />
+  <title>Low Poly Disc Golf</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=Manrope:wght@400;600;700&display=swap');
+    :root{
+      color-scheme:light dark;
+      --page:#d9e0cf;--ink:#17231d;--panel:#f4f1e8;--line:#21372c;--muted:#526158;
+      --accent:#d35b39;--accent-ink:#fffaf0;--key:#edbc4b;--shadow:#183126;
+      --field:#6f9e59;--field2:#83ad67;--facet:rgba(255,255,255,.16);
+    }
+    @media(prefers-color-scheme:dark){
+      :root{--page:#101916;--ink:#f3f0e6;--panel:#1c2923;--line:#9aac8c;--muted:#c0c8bd;--accent:#ee7650;--accent-ink:#151d19;--key:#edbf58;--shadow:#08110d;--field:#36573d;--field2:#426748;--facet:rgba(255,255,255,.08)}
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;min-height:100%;background:var(--page);color:var(--ink)}
+    body{font-family:"Manrope",sans-serif;padding:clamp(10px,2vw,24px);background-image:linear-gradient(135deg,transparent 0 49%,rgba(32,55,44,.05) 50% 51%,transparent 52%),linear-gradient(45deg,transparent 0 49%,rgba(32,55,44,.035) 50% 51%,transparent 52%);background-size:52px 52px}
+    body[data-biome="snow"]{--page:#dce5e4;--panel:#f5f4ee;--field:#b9cccb;--field2:#ccdcda}
+    body[data-biome="desert"]{--page:#dfc998;--panel:#f6e7c8;--field:#c58a48;--field2:#d6a157}
+    @media(prefers-color-scheme:dark){body[data-biome="snow"]{--page:#152125;--panel:#223036;--field:#68848a;--field2:#779399}body[data-biome="desert"]{--page:#211812;--panel:#33271c;--field:#76502e;--field2:#8b6136}}
+    button,input{font:inherit}button{color:inherit}
+    .play-column{min-width:0;display:flex;flex-direction:column;gap:13px}
+    .top-options{width:100%;margin:0}
+    .biome-bar{display:grid;grid-template-columns:auto repeat(3,minmax(0,1fr));align-items:stretch;background:var(--panel);border:1px solid color-mix(in srgb,var(--line) 65%,transparent);box-shadow:7px 7px 0 color-mix(in srgb,var(--shadow) 86%,transparent);clip-path:polygon(8px 0,100% 0,100% calc(100% - 8px),calc(100% - 8px) 100%,0 100%,0 8px)}
+    .biome-label{display:flex;align-items:center;padding:0 13px;font-family:"Barlow Condensed",sans-serif;font-weight:800;font-size:11px;letter-spacing:.16em;color:var(--muted);border-right:1px solid var(--line)}
+    .biome-tab,.round-tab{min-height:39px;border:0;border-right:1px solid color-mix(in srgb,var(--line) 60%,transparent);background:transparent;cursor:pointer;font-family:"Barlow Condensed",sans-serif;font-size:14px;font-weight:700;letter-spacing:.04em}
+    .round-tab{border-left:1px solid color-mix(in srgb,var(--line) 60%,transparent);border-right:0}.biome-tab:last-child,.round-tab:last-child{border-right:0}
+    .biome-tab[aria-selected="true"],.round-tab[aria-selected="true"]{background:var(--key);color:#19231c;clip-path:polygon(0 0,100% 0,100% calc(100% - 7px),calc(100% - 7px) 100%,0 100%)}
+    .biome-tab:focus-visible,.round-tab:focus-visible,.btn:focus-visible,.disc-btn:focus-visible,input:focus-visible{outline:3px solid var(--accent);outline-offset:-4px}
+    .app{width:min(1120px,100%);margin:auto;display:grid;grid-template-columns:minmax(270px,410px) minmax(300px,520px);gap:clamp(14px,2.2vw,26px);align-items:start;justify-content:center}
+    .side{display:flex;flex-direction:column;gap:13px;position:sticky;top:16px}
+    .seedbar,.card,.game-shell{background:var(--panel);border:1px solid color-mix(in srgb,var(--line) 65%,transparent);box-shadow:8px 8px 0 color-mix(in srgb,var(--shadow) 86%,transparent);clip-path:polygon(11px 0,100% 0,100% calc(100% - 11px),calc(100% - 11px) 100%,0 100%,0 11px)}
+    .seedbar{padding:13px;display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:8px;align-items:end}
+    .seed-label{font-family:"Barlow Condensed",sans-serif;font-size:11px;font-weight:800;letter-spacing:.12em;margin-bottom:5px;color:var(--muted)}
+    .seed-row{display:flex;gap:6px}.round-choice{display:grid;grid-template-columns:repeat(2,36px);border:1px solid var(--line);min-width:0}
+    #seedInput{min-width:0;width:100%;border:1px solid var(--line);background:color-mix(in srgb,var(--page) 42%,transparent);color:var(--ink);padding:8px 9px;text-transform:uppercase;font-weight:700;outline:none;border-radius:0}
+    .btn{border:1px solid var(--line);background:var(--key);color:#172119;padding:9px 12px;cursor:pointer;font-family:"Barlow Condensed",sans-serif;font-weight:800;letter-spacing:.05em;box-shadow:3px 3px 0 var(--line);border-radius:0;clip-path:polygon(5px 0,100% 0,100% calc(100% - 5px),calc(100% - 5px) 100%,0 100%,0 5px)}
+    .btn:hover{filter:brightness(1.04)}.btn:active{transform:translate(3px,3px);box-shadow:none}.btn.secondary{background:transparent;color:var(--ink)}.btn.red{background:var(--accent);color:var(--accent-ink)}
+    .card{padding:18px}.hole-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;border-bottom:1px solid color-mix(in srgb,var(--line) 42%,transparent);padding-bottom:12px}
+    .pixel-title{font-family:"Barlow Condensed",sans-serif;font-size:clamp(25px,3.1vw,34px);font-weight:800;line-height:1;margin:0;letter-spacing:-.02em;text-transform:uppercase}.hole-no{font-family:"Barlow Condensed",sans-serif;font-size:40px;font-weight:800;line-height:.8;color:var(--accent);white-space:nowrap}
+    .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-top:13px}.stat{background:color-mix(in srgb,var(--page) 56%,transparent);padding:9px 6px;text-align:center;clip-path:polygon(7px 0,100% 0,100% calc(100% - 7px),calc(100% - 7px) 100%,0 100%,0 7px)}
+    .stat b{font-family:"Barlow Condensed",sans-serif;font-size:22px;font-weight:800;display:block;margin-top:2px}.stat span{font-family:"Barlow Condensed";font-size:10px;font-weight:700;letter-spacing:.12em;color:var(--muted)}
+    .disc-title{font-family:"Barlow Condensed";font-size:11px;font-weight:800;letter-spacing:.13em;color:var(--muted);margin:16px 0 7px}.discs{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
+    .disc-btn{border:1px solid var(--line);padding:8px 4px 7px;background:transparent;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;justify-content:center;font-family:"Barlow Condensed";font-weight:700;line-height:1.05;clip-path:polygon(5px 0,100% 0,100% calc(100% - 5px),calc(100% - 5px) 100%,0 100%,0 5px)}
+    .disc-btn[aria-pressed="true"]{background:var(--key);color:#182016}.disc-dot{width:17px;height:9px;display:inline-block;clip-path:polygon(12% 35%,35% 0,82% 8%,100% 52%,68% 100%,17% 86%);background:#e55e42}
+    .disc-btn[data-disc="bison"] .disc-dot{background:#8a5cf6}.disc-btn[data-disc="vela"] .disc-dot{background:#ee7fb0}.disc-btn[data-disc="ridge"] .disc-dot{background:#eebc37}.disc-btn[data-disc="willow"] .disc-dot{background:#62b45e}.disc-btn[data-disc="stone"] .disc-dot{background:#55a7c9}
+    .disc-name{font-size:14px;letter-spacing:.03em}.disc-nums{font-size:10px;font-weight:600;letter-spacing:.08em;color:var(--muted)}.disc-btn[aria-pressed="true"] .disc-nums{color:#4a4436}
+    .disc-info{margin-top:8px;background:color-mix(in srgb,var(--page) 56%,transparent);padding:9px 11px;font-size:12px;line-height:1.55;color:var(--muted);clip-path:polygon(7px 0,100% 0,100% calc(100% - 7px),calc(100% - 7px) 100%,0 100%,0 7px)}.disc-info strong{color:var(--ink);font-family:"Barlow Condensed";letter-spacing:.06em}
+    .how{font-size:12px;line-height:1.6;margin:14px 0 0;color:var(--muted)}.how strong{color:var(--ink)}.actions{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+    .game-shell{padding:9px;position:relative;overflow:hidden}.canvas-wrap{position:relative;width:100%;aspect-ratio:48/85;background:var(--field);overflow:hidden;touch-action:none;cursor:crosshair;clip-path:polygon(10px 0,100% 0,100% calc(100% - 10px),calc(100% - 10px) 100%,0 100%,0 10px)}
+    canvas{display:block;width:100%;height:100%}.top-hud{position:absolute;top:10px;left:10px;right:10px;display:flex;justify-content:space-between;pointer-events:none;gap:8px}.hud-chip{background:rgba(17,30,23,.9);color:#fff8df;padding:7px 10px;font-family:"Barlow Condensed",sans-serif;font-size:11px;font-weight:800;letter-spacing:.07em;clip-path:polygon(6px 0,100% 0,100% calc(100% - 6px),calc(100% - 6px) 100%,0 100%,0 6px)}
+    .wind-arrow{display:inline-block;font-size:15px;transform:rotate(var(--wind,0deg))}.toast{position:absolute;left:50%;bottom:22px;transform:translateX(-50%);background:#17271f;color:#fff7e2;border:1px solid #fff0bb;padding:9px 13px;font-family:"Barlow Condensed";font-weight:800;letter-spacing:.06em;white-space:nowrap;pointer-events:none;opacity:0;transition:opacity .15s;z-index:4;clip-path:polygon(7px 0,100% 0,100% calc(100% - 7px),calc(100% - 7px) 100%,0 100%,0 7px)}.toast.show{opacity:1}
+    .mobile-throw-hint{display:none;background:#17271f;color:#fff7e2;padding:9px 10px;font-size:10px;line-height:1.45;text-align:center;letter-spacing:.03em}.mobile-throw-hint strong{color:var(--key)}
+    .overlay{position:absolute;inset:0;background:rgba(8,17,12,.82);display:none;place-items:center;padding:22px;z-index:5}.overlay.show{display:grid}.result{width:min(320px,100%);background:var(--panel);color:var(--ink);box-shadow:9px 9px 0 #080e09;padding:22px;text-align:center;clip-path:polygon(13px 0,100% 0,100% calc(100% - 13px),calc(100% - 13px) 100%,0 100%,0 13px)}
+    .result h2{font-family:"Barlow Condensed";font-size:34px;font-weight:800;line-height:1;margin:0 0 10px;color:var(--accent)}.result p{margin:7px 0 17px;font-size:13px;line-height:1.5}
+    .score-panel{position:fixed;inset:0;background:rgba(8,15,10,.76);display:none;z-index:20;padding:18px;overflow:auto}.score-panel.show{display:grid;place-items:center}.scorecard{width:min(700px,100%);background:var(--panel);box-shadow:9px 9px 0 #080e09;padding:20px;clip-path:polygon(13px 0,100% 0,100% calc(100% - 13px),calc(100% - 13px) 100%,0 100%,0 13px)}
+    .score-top{display:flex;justify-content:space-between;align-items:center;gap:10px}.score-top h2{font-family:"Barlow Condensed";font-size:27px;font-weight:800;margin:0}.score-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:3px;margin-top:16px}.score-cell{min-height:48px;padding:8px 4px;text-align:center;background:color-mix(in srgb,var(--page) 58%,transparent);font-size:10px;clip-path:polygon(5px 0,100% 0,100% calc(100% - 5px),calc(100% - 5px) 100%,0 100%,0 5px)}.score-cell b{font-family:"Barlow Condensed";font-size:20px;display:block}.score-cell.total{background:var(--key);color:#1b2418}
+    .legend{display:flex;flex-wrap:wrap;gap:7px 13px;font-size:10px;color:var(--muted);padding:3px 2px}.swatch{width:12px;height:12px;display:inline-block;vertical-align:-2px;margin-right:4px;clip-path:polygon(25% 0,100% 12%,82% 100%,8% 78%)}.sr{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+    @media(max-width:760px){body{padding:8px 8px 20px}.play-column{order:-1;width:100%;max-width:470px;margin:auto;gap:10px}.biome-label{padding:0 9px}.biome-tab{min-height:35px;font-size:13px}.app{display:flex;flex-direction:column}.side{position:static;width:100%}.game-shell{width:100%}.mobile-throw-hint{display:block}.card{padding:14px}.seedbar{grid-template-columns:minmax(0,1fr) auto auto}.round-choice{grid-template-columns:repeat(2,33px)}.actions{grid-template-columns:1fr 1fr}.score-grid{grid-template-columns:repeat(3,1fr)}.pixel-title{font-size:26px}.hole-head{align-items:center}.stats{margin-top:10px}.side{gap:9px}}
+    @media(max-width:390px){.disc-btn{font-size:12px}.btn{padding:8px 9px;font-size:12px}.seedbar{gap:6px}.seed-row{gap:4px}}
+    @media(prefers-reduced-motion:reduce){*{transition:none!important}}
+  </style>
+</head>
+<body data-biome="forest">
+  <main class="app">
+    <section class="side" aria-label="Game controls">
+      <div class="seedbar">
+        <div>
+          <div class="seed-label" id="seedLabel">9-HOLE COURSE SEED</div>
+          <div class="seed-row"><input id="seedInput" maxlength="18" aria-label="Course seed"><button class="btn secondary" id="loadSeed">LOAD</button></div>
+        </div>
+        <div>
+          <div class="seed-label">HOLES</div>
+          <div class="round-choice" role="tablist" aria-label="Round length">
+            <button class="round-tab" role="tab" data-length="9" aria-selected="true">9</button>
+            <button class="round-tab" role="tab" data-length="18" aria-selected="false">18</button>
+          </div>
+        </div>
+        <button class="btn red" id="newCourse">NEW 9</button>
+      </div>
+      <div class="card">
+        <div class="hole-head">
+          <div><h1 class="pixel-title" id="holeName">Pine Bend</h1><div class="seed-label" style="margin-top:5px">LOW POLY DISC GOLF</div></div>
+          <div class="hole-no" id="holeNumber">01</div>
+        </div>
+        <div class="stats">
+          <div class="stat"><span>PAR</span><b id="parStat">3</b></div>
+          <div class="stat"><span>DISTANCE</span><b id="distStat">286'</b></div>
+          <div class="stat"><span>THROWS</span><b id="throwStat">0</b></div>
+        </div>
+        <div class="disc-title">CHOOSE A DISC — FLIGHT NUMBERS: SPEED / GLIDE / TURN / FADE</div>
+        <div class="discs" role="group" aria-label="Disc selection">
+          <button class="disc-btn" data-disc="apex" aria-pressed="true"><i class="disc-dot"></i><span class="disc-name">Apex</span><span class="disc-nums">12 · 5 · −2 · 3</span></button>
+          <button class="disc-btn" data-disc="bison" aria-pressed="false"><i class="disc-dot"></i><span class="disc-name">Bison</span><span class="disc-nums">10 · 4 · 0 · 4</span></button>
+          <button class="disc-btn" data-disc="vela" aria-pressed="false"><i class="disc-dot"></i><span class="disc-name">Vela</span><span class="disc-nums">9 · 5 · −3 · 1</span></button>
+          <button class="disc-btn" data-disc="ridge" aria-pressed="false"><i class="disc-dot"></i><span class="disc-name">Ridge</span><span class="disc-nums">7 · 5 · −1 · 2</span></button>
+          <button class="disc-btn" data-disc="willow" aria-pressed="false"><i class="disc-dot"></i><span class="disc-name">Willow</span><span class="disc-nums">5 · 5 · −2 · 1</span></button>
+          <button class="disc-btn" data-disc="stone" aria-pressed="false"><i class="disc-dot"></i><span class="disc-name">Stone</span><span class="disc-nums">3 · 4 · 0 · 2</span></button>
+        </div>
+        <div class="disc-info" id="discInfo" aria-live="polite"></div>
+        <p class="how"><strong>Drag back from the disc</strong> to aim and set power, then release to throw. Every disc flies its numbers: negative turn drifts right early, fade hooks left late — and throws are shorter now, so most holes take an extra shot. Stronger, gusting wind, denser trees, wider OB, tighter pars and a smaller basket window — hot putts chain out. OB adds one stroke and your next lie is at the nearest edge. On marked holes, follow the mando arrow.</p>
+      </div>
+      <div class="actions"><button class="btn secondary" id="scoreBtn">SCORECARD</button><button class="btn secondary" id="resetHole">RESET HOLE</button></div>
+      <div class="legend" aria-label="Course legend"><span><i class="swatch" id="riverSwatch" style="background:#479bd1"></i>River OB</span><span><i class="swatch" id="pathSwatch" style="background:#d6c6a0"></i>Path OB</span><span><i class="swatch" id="treeSwatch" style="background:#305d32"></i><span id="treeLabel">Trees</span></span><span><i class="swatch" style="background:#d84f39"></i>Mando</span></div>
+    </section>
+
+    <div class="play-column">
+      <div class="top-options">
+        <nav class="biome-bar" role="tablist" aria-label="Course biome">
+          <span class="biome-label">BIOME</span>
+          <button class="biome-tab" role="tab" data-biome="forest" aria-selected="true">Forest</button>
+          <button class="biome-tab" role="tab" data-biome="snow" aria-selected="false">Snow</button>
+          <button class="biome-tab" role="tab" data-biome="desert" aria-selected="false">Desert</button>
+        </nav>
+      </div>
+      <section class="game-shell" aria-label="Disc golf course">
+        <div class="canvas-wrap" id="canvasWrap">
+          <canvas id="game" width="384" height="680" tabindex="0" role="application" aria-label="Top-down low-poly disc golf hole. Drag back from your disc and release to throw. Keyboard players can press Enter to throw toward the basket."></canvas>
+          <div class="top-hud"><span class="hud-chip" id="lieChip">TEE · 286 FT</span><span class="hud-chip"><span class="wind-arrow" id="windArrow">↑</span> <span id="windText">3 MPH</span></span></div>
+          <div class="toast" id="toast" role="status"></div>
+          <div class="overlay" id="resultOverlay">
+            <div class="result"><h2 id="resultTitle">BIRDIE!</h2><p id="resultCopy">2 throws on a par 3.</p><button class="btn red" id="nextHole">NEXT HOLE</button></div>
+          </div>
+        </div>
+        <div class="mobile-throw-hint"><strong>TO THROW:</strong> touch the glowing disc, pull away from the basket, then release</div>
+      </section>
+    </div>
+  </main>
+
+  <div class="score-panel" id="scorePanel" role="dialog" aria-modal="true" aria-labelledby="scoreTitle">
+    <div class="scorecard"><div class="score-top"><h2 id="scoreTitle">ROUND CARD</h2><button class="btn secondary" id="closeScore">CLOSE</button></div><div class="score-grid" id="scoreGrid"></div></div>
+  </div>
+
+<script>
+(function(){
+  'use strict';
+  var canvas=document.getElementById('game'),ctx=canvas.getContext('2d');
+  var wrap=document.getElementById('canvasWrap');
+  ctx.imageSmoothingEnabled=true;
+  var W=384,H=680, seed='', holes=[], holeIndex=0, roundLength=9, scores=new Array(roundLength).fill(null), strokes=0;
+  var discType='apex', disc={x:192,y:600,vx:0,vy:0,moving:false}, lastLie={x:192,y:600};
+  var DISCS={
+    apex:{label:'APEX · DISTANCE DRIVER',nums:'12 / 5 / −2 / 3',color:'#e85c42',mult:.108,drag:.978,turn:.0042,fade:.0075,turnFrames:34,desc:'Longest disc in the bag. Turns right early, then a hard left fade late. Big power, hard to keep straight — aim left of your line and let the fade work.'},
+    bison:{label:'BISON · OVERSTABLE DRIVER',nums:'10 / 4 / 0 / 4',color:'#8a5cf6',mult:.100,drag:.976,turn:.0006,fade:.0085,turnFrames:20,desc:'No turn at all and the heaviest fade in the bag. Fights wind and dumps left at the end — the safe pick into a headwind or around a left corner.'},
+    vela:{label:'VELA · UNDERSTABLE DRIVER',nums:'9 / 5 / −3 / 1',color:'#ee7fb0',mult:.102,drag:.977,turn:.0068,fade:.0032,turnFrames:54,desc:'The flippy one. Holds a long right turn and barely fades back — made for right-turning holes and tailwind bombs, risky if you overpower it.'},
+    ridge:{label:'RIDGE · FAIRWAY DRIVER',nums:'7 / 5 / −1 / 2',color:'#e6b438',mult:.096,drag:.976,turn:.0026,fade:.0052,turnFrames:38,desc:'Slower and straighter than the big drivers, with a gentle S-curve. The control pick off the tee when the trees close in.'},
+    willow:{label:'WILLOW · UNDERSTABLE MID',nums:'5 / 5 / −2 / 1',color:'#62b45e',mult:.082,drag:.974,turn:.0050,fade:.0026,turnFrames:46,desc:'A flippy mid that drifts right and lands soft with almost no fade. Great for shaping approach shots, touchy at full power.'},
+    stone:{label:'STONE · PUTTER',nums:'3 / 4 / 0 / 2',color:'#54a7c8',mult:.064,drag:.970,turn:.0011,fade:.0036,turnFrames:26,desc:'Slow, straight and short, with a modest late fade. For putts and layups inside 150 ft — come in too hot and you will chain out.'}
+  };
+  var dragging=false, dragX=0,dragY=0, anim=0, finished=false, toastTimer=0, trail=[], mandoState='none', currentBiome='forest', flightFrames=0, restarting=false;
+  var reducedMotion=matchMedia('(prefers-reduced-motion:reduce)').matches,isDark=matchMedia('(prefers-color-scheme:dark)').matches;
+  var palettes={
+    forest:{grass:'#739b5a',grass2:'#88aa69',facet:'#9bbb7c',dark:'#294932',tree:'#2f6540',tree2:'#4c8150',tree3:'#6b985a',trunk:'#76513a',river:'#3a91b0',river2:'#74bfd0',riverEdge:'#286d8b',path:'#c8b58b',path2:'#a08d67',tee:'#7f8b84',white:'#f5efd8',basket:'#d9d8cc',red:'#d75b3f'},
+    snow:{grass:'#b9cccb',grass2:'#cadad8',facet:'#dce8e5',dark:'#78979b',tree:'#315c55',tree2:'#47796b',tree3:'#69998a',trunk:'#68564a',river:'#65abc1',river2:'#c4e8e9',riverEdge:'#397e98',path:'#c8c5bb',path2:'#99988f',tee:'#75878c',white:'#fffdf2',basket:'#e8edef',red:'#d65d4d'},
+    desert:{grass:'#c88c48',grass2:'#d9a45b',facet:'#e5b96f',dark:'#94602e',tree:'#3c704c',tree2:'#5d8c5e',tree3:'#82a66f',trunk:'#7d5837',river:'#3c96aa',river2:'#83cbd1',riverEdge:'#2b7080',path:'#ddbc77',path2:'#ae8149',tee:'#8c7d6a',white:'#fff0cc',basket:'#e3ddd1',red:'#c95037'}
+  };
+  if(isDark){palettes.forest.grass='#36573d';palettes.forest.grass2='#426748';palettes.forest.facet='#4e7352';palettes.forest.dark='#183523';palettes.forest.tree='#224a31';palettes.forest.tree2='#32613d';palettes.forest.tree3='#47794a';palettes.snow.grass='#68848a';palettes.snow.grass2='#779399';palettes.snow.facet='#89a1a5';palettes.snow.dark='#49666d';palettes.desert.grass='#76502e';palettes.desert.grass2='#8b6136';palettes.desert.facet='#a17443';palettes.desert.dark='#56371f'}
+  var palette=palettes.forest;
+  function hash(s){var h=2166136261;for(var i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)}return h>>>0}
+  function rngFrom(s){var a=hash(s);return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+  function randomSeed(){var words=['MOSS','CHAIN','CEDAR','BIRDIE','FIR','RIVER','EAGLE','ACORN','HYZER','RIDGE'];var r=Math.random;return words[Math.floor(r()*words.length)]+'-'+String(Math.floor(r()*9000)+1000)}
+  function pointSegDist(px,py,x1,y1,x2,y2){var dx=x2-x1,dy=y2-y1,l=dx*dx+dy*dy;if(!l)return Math.hypot(px-x1,py-y1);var t=Math.max(0,Math.min(1,((px-x1)*dx+(py-y1)*dy)/l));return Math.hypot(px-(x1+t*dx),py-(y1+t*dy))}
+  function pointFeatureDist(px,py,f){var best=Infinity;for(var i=1;i<f.points.length;i++)best=Math.min(best,pointSegDist(px,py,f.points[i-1].x,f.points[i-1].y,f.points[i].x,f.points[i].y));return best}
+  function segmentIntersection(a,b,c,d){var rX=b.x-a.x,rY=b.y-a.y,sX=d.x-c.x,sY=d.y-c.y,den=rX*sY-rY*sX;if(Math.abs(den)<.0001)return null;var qx=c.x-a.x,qy=c.y-a.y,t=(qx*sY-qy*sX)/den,u=(qx*rY-qy*rX)/den;if(t<0||t>1||u<0||u>1)return null;return{x:a.x+t*rX,y:a.y+t*rY,angle:Math.atan2(rY,rX)}}
+  function findCrossings(path,river){if(!path||!river)return[];var hits=[];for(var i=1;i<path.points.length;i++)for(var j=1;j<river.points.length;j++){var hit=segmentIntersection(path.points[i-1],path.points[i],river.points[j-1],river.points[j]);if(hit&&!hits.some(function(q){return Math.hypot(q.x-hit.x,q.y-hit.y)<18}))hits.push(hit)}return hits}
+  function featurePoints(x1,y1,x2,y2,r,amount){var base=[],out=[],dx=x2-x1,dy=y2-y1,len=Math.hypot(dx,dy),nx=-dy/len,ny=dx/len,count=5+Math.floor(r()*3),phase=r()*Math.PI*2,freq=2+Math.floor(r()*2);for(var i=0;i<count;i++){var t=i/(count-1),sway=Math.sin(t*Math.PI*freq+phase)*amount*(.45+r()*.55)+(i>0&&i<count-1?(r()-.5)*amount*.8:0);base.push({x:x1+dx*t+nx*sway,y:y1+dy*t+ny*sway})}out.push(base[0]);var start=base[0];for(var j=1;j<base.length-1;j++){var control=base[j],end={x:(base[j].x+base[j+1].x)/2,y:(base[j].y+base[j+1].y)/2};for(var k=1;k<=7;k++){var u=k/7,om=1-u;out.push({x:om*om*start.x+2*om*u*control.x+u*u*end.x,y:om*om*start.y+2*om*u*control.y+u*u*end.y})}start=end}for(var z=1;z<=7;z++){var v=z/7;out.push({x:start.x+(base[base.length-1].x-start.x)*v,y:start.y+(base[base.length-1].y-start.y)*v})}return out}
+  function basketTouchesFeature(b,f){return f&&pointFeatureDist(b.x,b.y+13,f)<f.width/2+26}
+  function basketSpotClear(b,river,path,trees){if(basketTouchesFeature(b,river)||basketTouchesFeature(b,path))return false;for(var i=0;i<trees.length;i++){var t=trees[i];if(Math.hypot(b.x-t.x,b.y+13-t.y)<t.s+30)return false}return true}
+  function placeBasket(initial,river,path,trees){if(basketSpotClear(initial,river,path,trees))return initial;for(var radius=12;radius<=180;radius+=12){for(var i=0;i<32;i++){var a=i*Math.PI/16,candidate={x:Math.max(36,Math.min(W-36,initial.x+Math.cos(a)*radius)),y:Math.max(42,Math.min(190,initial.y+Math.sin(a)*radius))};if(basketSpotClear(candidate,river,path,trees))return candidate}}for(var y=42;y<=190;y+=8)for(var x=36;x<=W-36;x+=8){var fallback={x:x,y:y};if(basketSpotClear(fallback,river,path,trees))return fallback}return initial}
+  function makeCourse(s){var r=rngFrom(s),walkR=rngFrom(s+'-walkers'), namesA=['Pine','Cedar','Otter','Moss','Raven','Fern','Chain','Salmon','Fox','Eagle'],namesB=['Bend','Run','Gap','Hollow','Crossing','Ridge','Landing','Turn','Lane','Reach'];var arr=[],walkerSlots={};
+    for(var block=0;block<roundLength;block+=9){var walkerCount=walkR()<.5?1:2,walkerHoles=[];while(walkerHoles.length<walkerCount){var walkerPick=block+Math.floor(walkR()*Math.min(9,roundLength-block));if(walkerHoles.indexOf(walkerPick)<0)walkerHoles.push(walkerPick)}walkerHoles.forEach(function(index){walkerSlots[index]={reverse:walkR()<.5,speed:.00070+walkR()*.00045,step:walkR()*Math.PI*2}})}
+    for(var h=0;h<roundLength;h++){
+      var par=r()<.78?3:(r()<.95?4:5), basket={x:72+r()*240,y:55+r()*80}, tee={x:120+r()*144,y:H-148+r()*28};
+      var trees=[],count=20+Math.floor(r()*14);for(var i=0;i<count;i++){var tx=25+r()*334,ty=95+r()*(H-220);if(pointSegDist(tx,ty,tee.x,tee.y,basket.x,basket.y)>22&&Math.hypot(tx-tee.x,ty-tee.y)>38&&Math.hypot(tx-basket.x,ty-basket.y)>38)trees.push({x:tx,y:ty,s:13+Math.floor(r()*10)})}
+      var river=null,path=null;
+      if(r()<.93){var ry=205+r()*(H-455),rx1=-45,ry1=ry+(r()-.5)*35,rx2=429,ry2=ry+(r()-.5)*170;river={points:featurePoints(rx1,ry1,rx2,ry2,r,34+r()*38),width:27+r()*16}}
+      var hasPath=r()<.95;if(hasPath||walkerSlots[h]){var side=r()<.5,px1=side?-35:419,py1=H-150+r()*80,px2=side?419:-35,py2=105+r()*145;path={points:featurePoints(px1,py1,px2,py2,r,40+r()*52),width:15+r()*9}}
+      basket=placeBasket(basket,river,path,trees);
+      trees=trees.filter(function(t){return Math.hypot(basket.x-t.x,basket.y+13-t.y)>=t.s+30});
+      if(basketTouchesFeature(basket,river))river=null;
+      if(basketTouchesFeature(basket,path))path=null;
+      var bridges=findCrossings(path,river);
+      trees=trees.filter(function(t){return !bridges.some(function(b){return Math.hypot(t.x-b.x,t.y-b.y)<t.s+24})});
+      var pixelDist=Math.hypot(tee.x-basket.x,tee.y-basket.y),feet=Math.round((pixelDist*.68)/5)*5;
+      arr.push({par:par,feet:feet,basket:basket,tee:tee,trees:trees,river:river,path:path,bridges:bridges,pedestrian:null,mando:null,name:namesA[Math.floor(r()*namesA.length)]+' '+namesB[Math.floor(r()*namesB.length)],wind:(r()-.5)*5.6,windAngle:r()*Math.PI*2,phase:r()*20});
+    }
+    Object.keys(walkerSlots).forEach(function(key){var index=parseInt(key,10),spec=walkerSlots[index];if(arr[index].path)arr[index].pedestrian={path:arr[index].path,reverse:spec.reverse,t:0,speed:spec.speed,step:spec.step}});
+    var mandoHoles=[],mandoCount=Math.round(roundLength/2);while(mandoHoles.length<mandoCount){var pick=Math.floor(r()*roundLength);if(mandoHoles.indexOf(pick)<0)mandoHoles.push(pick)}
+    mandoHoles.forEach(function(index){var hole=arr[index],dx=hole.basket.x-hole.tee.x,dy=hole.basket.y-hole.tee.y,len=Math.hypot(dx,dy),ux=dx/len,uy=dy/len,nx=-uy,ny=ux,t=.38+r()*.25,offset=(r()<.5?-1:1)*(30+r()*22);hole.mando={x:hole.tee.x+dx*t+nx*offset,y:hole.tee.y+dy*t+ny*offset,ux:ux,uy:uy,nx:nx,ny:ny,required:offset>0?-1:1}});
+    return arr;
+  }
+  function startCourse(s){seed=(s.trim()||randomSeed()).toUpperCase();document.getElementById('seedInput').value=seed;holes=makeCourse(seed);holeIndex=0;scores=new Array(roundLength).fill(null);document.getElementById('seedLabel').textContent=roundLength+'-HOLE COURSE SEED';document.getElementById('newCourse').textContent='NEW '+roundLength;loadHole()}
+  function loadHole(){var h=holes[holeIndex];strokes=0;finished=false;restarting=false;flightFrames=0;disc.x=h.tee.x;disc.y=h.tee.y;disc.vx=disc.vy=0;disc.moving=false;lastLie={x:disc.x,y:disc.y};mandoState=h.mando?'pending':'none';trail=[];if(h.pedestrian)h.pedestrian.t=0;document.getElementById('resultOverlay').classList.remove('show');updateUI();draw()}
+  function updateUI(){var h=holes[holeIndex];document.getElementById('holeName').textContent=h.name;document.getElementById('holeNumber').textContent=String(holeIndex+1).padStart(2,'0');document.getElementById('parStat').textContent=h.par;document.getElementById('distStat').textContent=h.feet+"'";document.getElementById('throwStat').textContent=strokes;var rem=strokes?Math.round(Math.hypot(disc.x-h.basket.x,disc.y-h.basket.y)*.68):h.feet;document.getElementById('lieChip').textContent=(strokes?'LIE':'TEE')+' · '+rem+' FT';var deg=h.windAngle*180/Math.PI;document.getElementById('windArrow').style.setProperty('--wind',deg+'deg');document.getElementById('windText').textContent=Math.max(1,Math.round(Math.abs(h.wind)*5))+' MPH'}
+  function rect(x,y,w,h,c){ctx.fillStyle=c;ctx.fillRect(Math.round(x),Math.round(y),Math.round(w),Math.round(h))}
+  function line(x1,y1,x2,y2,w,c){ctx.strokeStyle=c;ctx.lineWidth=w;ctx.lineCap='butt';ctx.beginPath();ctx.moveTo(Math.round(x1),Math.round(y1));ctx.lineTo(Math.round(x2),Math.round(y2));ctx.stroke()}
+  function poly(points,c,stroke){ctx.fillStyle=c;ctx.beginPath();ctx.moveTo(points[0][0],points[0][1]);for(var i=1;i<points.length;i++)ctx.lineTo(points[i][0],points[i][1]);ctx.closePath();ctx.fill();if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=1;ctx.stroke()}}
+  function tri(x1,y1,x2,y2,x3,y3,c){poly([[x1,y1],[x2,y2],[x3,y3]],c)}
+  function strokeFeature(f,w,c){var p=f.points;ctx.strokeStyle=c;ctx.lineWidth=w;ctx.lineCap='butt';ctx.lineJoin='bevel';ctx.beginPath();ctx.moveTo(Math.round(p[0].x),Math.round(p[0].y));for(var i=1;i<p.length;i+=3)ctx.lineTo(Math.round(p[i].x),Math.round(p[i].y));var end=p[p.length-1];ctx.lineTo(Math.round(end.x),Math.round(end.y));ctx.stroke()}
+  function pointOnFeature(f,t){var p=f.points,n=(p.length-1)*Math.max(0,Math.min(.9999,t)),i=Math.floor(n),u=n-i;return{x:p[i].x+(p[i+1].x-p[i].x)*u,y:p[i].y+(p[i+1].y-p[i].y)*u}}
+  function drawBridge(b,path,river){var len=river.width+18,deck=path.width+7;ctx.save();ctx.translate(Math.round(b.x),Math.round(b.y));ctx.rotate(b.angle);poly([[-len/2-4,-deck/2-4],[len/2+4,-deck/2-2],[len/2+2,deck/2+4],[-len/2-3,deck/2+2]],palette.trunk);poly([[-len/2,-deck/2],[len/2,-deck/2+1],[len/2-1,deck/2],[-len/2+1,deck/2]],palette.path);for(var x=-len/2+4;x<len/2;x+=7)line(x,-deck/2+1,x-1,deck/2-1,1,palette.path2);line(-len/2,-deck/2-4,len/2,-deck/2-3,2,palette.white);line(-len/2,deck/2+3,len/2,deck/2+4,2,palette.white);ctx.restore()}
+  function drawTree(t){var s=t.s;if(currentBiome==='desert'){poly([[t.x-3,t.y+s],[t.x-4,t.y-s*.65],[t.x+4,t.y-s*.8],[t.x+3,t.y+s]],palette.tree);poly([[t.x-4,t.y-s*.15],[t.x-s*.72,t.y-s*.3],[t.x-s*.72,t.y-s*.58],[t.x-s*.52,t.y-s*.68],[t.x-s*.48,t.y-s*.39],[t.x-2,t.y-s*.34]],palette.tree2);poly([[t.x+3,t.y-s*.42],[t.x+s*.62,t.y-s*.55],[t.x+s*.62,t.y-s*.82],[t.x+s*.45,t.y-s*.92],[t.x+s*.4,t.y-s*.62],[t.x+3,t.y-s*.57]],palette.tree3);tri(t.x-6,t.y+s,t.x+8,t.y+s,t.x+2,t.y+s+4,palette.dark);return}poly([[t.x-3,t.y+5],[t.x+4,t.y+5],[t.x+5,t.y+18],[t.x-5,t.y+18]],palette.trunk);tri(t.x,t.y-s,t.x-s*.9,t.y+s*.5,t.x+s*.75,t.y+s*.52,palette.tree);tri(t.x,t.y-s*.72,t.x-s*.68,t.y+s*.2,t.x+s*.86,t.y+s*.28,palette.tree2);tri(t.x+1,t.y-s*.95,t.x-s*.46,t.y-s*.05,t.x+s*.55,t.y-s*.02,palette.tree3);if(currentBiome==='snow'){tri(t.x,t.y-s*.98,t.x-s*.42,t.y-s*.15,t.x+s*.18,t.y-s*.16,'#eef5f2');tri(t.x-s*.17,t.y-s*.55,t.x-s*.66,t.y+s*.12,t.x-s*.05,t.y+.02,'#dceae6')}tri(t.x-s*.72,t.y+s*.52,t.x+s*.75,t.y+s*.52,t.x+s*.15,t.y+s*.63,palette.dark)}
+  function drawBasket(b){line(b.x,b.y+2,b.x,b.y+34,3,'#c7c8c0');poly([[b.x-15,b.y+5],[b.x+14,b.y+4],[b.x+11,b.y+9],[b.x-12,b.y+10]],'#eef0e6');poly([[b.x-11,b.y+19],[b.x+11,b.y+18],[b.x+8,b.y+23],[b.x-8,b.y+24]],'#babeb7');for(var i=-8;i<=8;i+=4)line(b.x+i,b.y+9,b.x+i*.62,b.y+19,1,'#edf0df');poly([[b.x-8,b.y+23],[b.x+8,b.y+22],[b.x+6,b.y+29],[b.x-5,b.y+30]],'#aeb3ad');poly([[b.x-2,b.y-7],[b.x+3,b.y-7],[b.x+3,b.y+5],[b.x-2,b.y+5]],'#d9dad1');poly([[b.x+2,b.y-7],[b.x+14,b.y-5],[b.x+12,b.y+2],[b.x+2,b.y+1]],palette.red)}
+  function drawMando(m){ctx.save();ctx.translate(Math.round(m.x),Math.round(m.y));poly([[-3,-2],[3,-2],[2,20],[-2,20]],'#252c27');tri(-4,20,5,20,0,23,'#1d2c23');ctx.rotate(Math.atan2(m.ny*m.required,m.nx*m.required));poly([[-13,-13],[10,-12],[13,-5],[9,3],[-13,2]],palette.red,'#76291f');line(-7,-5,6,-5,3,'#fff4cf');line(6,-5,1,-10,3,'#fff4cf');line(6,-5,1,0,3,'#fff4cf');ctx.restore();ctx.save();ctx.font='800 8px "Barlow Condensed"';ctx.textAlign='center';ctx.fillStyle='#fff4cf';ctx.strokeStyle='#17231b';ctx.lineWidth=3;ctx.strokeText('MANDO',Math.round(m.x),Math.round(m.y+31));ctx.fillText('MANDO',Math.round(m.x),Math.round(m.y+31));ctx.restore()}
+  function pedestrianPos(p){return pointOnFeature(p.path,p.reverse?1-p.t:p.t)}
+  function drawPedestrian(p){var q=pedestrianPos(p),step=reducedMotion?0:Math.sin(p.step)*3,skin='#dda06a',shirt=currentBiome==='snow'?'#d85b42':'#395779';poly([[q.x-4,q.y-15],[q.x+3,q.y-15],[q.x+5,q.y-10],[q.x,q.y-7],[q.x-5,q.y-10]],skin);poly([[q.x-5,q.y-8],[q.x+5,q.y-7],[q.x+4,q.y+4],[q.x-4,q.y+5]],shirt);poly([[q.x-3,q.y+4],[q.x,q.y+4],[q.x-2-step,q.y+14],[q.x-6-step,q.y+14]],'#2f2a28');poly([[q.x,q.y+4],[q.x+4,q.y+4],[q.x+6+step,q.y+13],[q.x+2+step,q.y+14]],'#262b2c');line(q.x-4,q.y-5,q.x-8+step,q.y+4,3,skin);line(q.x+4,q.y-5,q.x+8-step,q.y+3,3,skin);if(currentBiome==='desert')poly([[q.x-7,q.y-15],[q.x+7,q.y-15],[q.x+4,q.y-18],[q.x-4,q.y-18]],'#ead28a');if(currentBiome==='snow')poly([[q.x-5,q.y-16],[q.x+5,q.y-16],[q.x+2,q.y-20],[q.x-3,q.y-20]],'#355c72')}
+  function drawCourse(){var h=holes[holeIndex],ground=rngFrom(seed+'-'+holeIndex+'-'+currentBiome+'-facets');ctx.fillStyle=palette.grass;ctx.fillRect(0,0,W,H);var cell=48;for(var gy=-cell;gy<H+cell;gy+=cell){for(var gx=-cell;gx<W+cell;gx+=cell){var ox=(ground()-.5)*15,oy=(ground()-.5)*15,x=gx+ox,y=gy+oy,flip=ground()>.5;if(flip){tri(x,y,x+cell+12,y+4,x+cell-5,y+cell+8,ground()>.45?palette.grass2:palette.facet);tri(x,y,x+cell-5,y+cell+8,x-8,y+cell,ground()>.7?palette.dark:palette.grass)}else{tri(x,y,x+cell+8,y,x-4,y+cell+9,ground()>.45?palette.grass2:palette.facet);tri(x+cell+8,y,x+cell-3,y+cell,x-4,y+cell+9,ground()>.7?palette.dark:palette.grass)}}}
+    if(h.path){strokeFeature(h.path,h.path.width+6,palette.path2);strokeFeature(h.path,h.path.width,palette.path);for(var p=1;p<16;p++){var pp=pointOnFeature(h.path,p/16),side=p%2?1:-1;tri(pp.x-4,pp.y-2,pp.x+4,pp.y,pp.x+side,pp.y+3,palette.path2)}}
+    if(h.river){strokeFeature(h.river,h.river.width+6,palette.riverEdge);strokeFeature(h.river,h.river.width,palette.river);for(var w=1;w<18;w++){var rp=pointOnFeature(h.river,w/18),wid=5+(w%4)*2;tri(rp.x-wid,rp.y-2,rp.x+wid,rp.y,rp.x-wid*.35,rp.y+3,w%2?palette.river2:palette.riverEdge)}}
+    if(h.bridges&&h.bridges.length)h.bridges.forEach(function(b){drawBridge(b,h.path,h.river)});
+    poly([[h.tee.x-12,h.tee.y-18],[h.tee.x+10,h.tee.y-17],[h.tee.x+13,h.tee.y+18],[h.tee.x-11,h.tee.y+17]],currentBiome==='snow'?'#697c81':'#59645f');poly([[h.tee.x-8,h.tee.y-14],[h.tee.x+7,h.tee.y-13],[h.tee.x+9,h.tee.y+14],[h.tee.x-7,h.tee.y+13]],palette.tee);tri(h.tee.x-7,h.tee.y-14,h.tee.x+7,h.tee.y-13,h.tee.x+8,h.tee.y+3,currentBiome==='desert'?'#ad9b7b':'#9eaaa3');
+    var sorted=h.trees.slice().sort(function(a,b){return a.y-b.y});sorted.forEach(drawTree);drawBasket(h.basket);if(h.mando)drawMando(h.mando);if(h.pedestrian)drawPedestrian(h.pedestrian);
+  }
+  function drawDisc(){var c=DISCS[discType].color;for(var i=0;i<trail.length;i++){ctx.globalAlpha=(i+1)/trail.length*.2;tri(trail[i].x-3,trail[i].y,trail[i].x+2,trail[i].y-2,trail[i].x+4,trail[i].y+2,c)}ctx.globalAlpha=1;poly([[disc.x-7,disc.y-1],[disc.x-3,disc.y-4],[disc.x+5,disc.y-3],[disc.x+7,disc.y+1],[disc.x+2,disc.y+4],[disc.x-5,disc.y+3]],'#26342c');poly([[disc.x-6,disc.y-2],[disc.x-2,disc.y-4],[disc.x+5,disc.y-2],[disc.x+4,disc.y+1],[disc.x-4,disc.y+2]],c);tri(disc.x-2,disc.y-4,disc.x+5,disc.y-2,disc.x,disc.y,'#fff0bd')}
+  function drawGrabGuide(){if(disc.moving||dragging||finished)return;var pulse=reducedMotion?0:(Math.sin(Date.now()/260)+1)/2,r=18+pulse*5;ctx.save();ctx.globalAlpha=.7-pulse*.24;ctx.strokeStyle='#fff3bf';ctx.lineWidth=3;ctx.setLineDash([5,4]);ctx.beginPath();ctx.arc(Math.round(disc.x),Math.round(disc.y),r,0,Math.PI*2);ctx.stroke();ctx.restore()}
+  function drawAim(){if(!dragging)return;var dx=disc.x-dragX,dy=disc.y-dragY,mag=Math.min(115,Math.hypot(dx,dy));if(mag<2)return;var a=Math.atan2(dy,dx),ex=disc.x+Math.cos(a)*mag*1.55,ey=disc.y+Math.sin(a)*mag*1.55;line(disc.x,disc.y,ex,ey,2,'rgba(255,243,191,.45)');var D=DISCS[discType],sx=disc.x,sy=disc.y,svx=dx*D.mult,svy=dy*D.mult;for(var s=1;s<=60;s++){var tr=s<D.turnFrames?-D.turn:D.fade,tc=Math.cos(tr),ts=Math.sin(tr),nvx=svx*tc-svy*ts,nvy=svx*ts+svy*tc;svx=nvx*D.drag;svy=nvy*D.drag;sx+=nvx;sy+=nvy;if(s%5===0)rect(sx-2,sy-2,4,4,s>=55?palette.red:'#fff3bf');if(Math.hypot(svx,svy)<.4)break}rect(12,H-18,120,8,'#233b28');rect(14,H-16,Math.max(0,116*mag/115),4,mag>90?palette.red:'#f5c84f')}
+  function draw(){drawCourse();drawDisc();drawGrabGuide();drawAim()}
+  function isOB(x,y,h){if(h.river&&pointFeatureDist(x,y,h.river)<h.river.width/2+3)return true;if(h.path&&pointFeatureDist(x,y,h.path)<h.path.width/2+3)return true;return x<5||x>W-5||y<5||y>H-5}
+  function nearestLegalLie(x,y,h){var sx=Math.max(8,Math.min(W-8,x)),sy=Math.max(8,Math.min(H-8,y));if(!isOB(sx,sy,h))return{x:sx,y:sy};for(var radius=2;radius<=120;radius+=2){for(var i=0;i<64;i++){var a=i*Math.PI/32,cx=Math.max(8,Math.min(W-8,sx+Math.cos(a)*radius)),cy=Math.max(8,Math.min(H-8,sy+Math.sin(a)*radius));if(!isOB(cx,cy,h))return{x:cx,y:cy}}}return{x:lastLie.x,y:lastLie.y}}
+  function checkMando(x1,y1,x2,y2,h){if(mandoState!=='pending'||!h.mando)return false;var m=h.mando,a1=(x1-m.x)*m.ux+(y1-m.y)*m.uy,a2=(x2-m.x)*m.ux+(y2-m.y)*m.uy;if(a1<0&&a2>=0){var t=-a1/(a2-a1),cx=x1+(x2-x1)*t,cy=y1+(y2-y1)*t,side=(cx-m.x)*m.nx+(cy-m.y)*m.ny;if(side*m.required>=20){mandoState='cleared';showToast('MANDO MADE!')}else{mandoState='missed';disc.moving=false;strokes++;var drop=nearestLegalLie(m.x-m.ux*22+m.nx*m.required*20,m.y-m.uy*22+m.ny*m.required*20,h);disc.x=drop.x;disc.y=drop.y;lastLie={x:drop.x,y:drop.y};trail=[];showToast('MISSED MANDO · +1');updateUI();return true}}return false}
+  function showToast(msg){var t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(function(){t.classList.remove('show')},1800)}
+  function finishHole(){finished=true;scores[holeIndex]=strokes;updateUI();var h=holes[holeIndex],d=strokes-h.par;var title=strokes===1?'ACE!':d<=-2?'EAGLE!':d===-1?'BIRDIE!':d===0?'PAR':d===1?'BOGEY':'+'+d;document.getElementById('resultTitle').textContent=title;document.getElementById('resultCopy').textContent=strokes+' throw'+(strokes===1?'':'s')+' on a par '+h.par+'.';document.getElementById('nextHole').textContent=holeIndex===roundLength-1?'VIEW ROUND':'NEXT HOLE';document.getElementById('resultOverlay').classList.add('show')}
+  function tick(){var h=holes[holeIndex];if(h&&h.pedestrian&&!finished&&!reducedMotion){h.pedestrian.t+=h.pedestrian.speed;if(h.pedestrian.t>1)h.pedestrian.t=0;h.pedestrian.step+=.15}if(disc.moving&&!restarting){var oldX=disc.x,oldY=disc.y;flightFrames++;var D=DISCS[discType],turnRate=flightFrames<D.turnFrames?-D.turn:D.fade,ca=Math.cos(turnRate),sa=Math.sin(turnRate),rvx=disc.vx*ca-disc.vy*sa,rvy=disc.vx*sa+disc.vy*ca,gust=.0022+Math.sin(flightFrames*.08+h.phase)*.0013;disc.vx=rvx+Math.cos(h.windAngle)*h.wind*gust;disc.vy=rvy+Math.sin(h.windAngle)*h.wind*gust;disc.x+=disc.vx;disc.y+=disc.vy;disc.vx*=D.drag;disc.vy*=D.drag;trail.push({x:disc.x,y:disc.y});if(trail.length>34)trail.shift();if(h.pedestrian){var walker=pedestrianPos(h.pedestrian);if(Math.hypot(disc.x-walker.x,disc.y-walker.y)<16){disc.moving=false;restarting=true;showToast('PEDESTRIAN HIT · RESTARTING HOLE');setTimeout(loadHole,950)}}for(var i=0;i<h.trees.length&&!restarting;i++){var t=h.trees[i],dd=Math.hypot(disc.x-t.x,disc.y-t.y);if(dd<t.s*.88){var a=Math.atan2(disc.y-t.y,disc.x-t.x),speed=Math.hypot(disc.vx,disc.vy)*.16;disc.x=t.x+Math.cos(a)*t.s*.94;disc.y=t.y+Math.sin(a)*t.s*.94;disc.vx=Math.cos(a)*speed;disc.vy=Math.sin(a)*speed;showToast(currentBiome==='desert'?'CACTUS HIT!':'TREE HIT!');break}}
+      if(!restarting&&!checkMando(oldX,oldY,disc.x,disc.y,h)){var basketDist=Math.hypot(disc.x-h.basket.x,disc.y-(h.basket.y+15)),discSpeed=Math.hypot(disc.vx,disc.vy);if(basketDist<7&&discSpeed<2.4){disc.moving=false;disc.x=h.basket.x;disc.y=h.basket.y+17;finishHole()}
+      else if(basketDist<13&&discSpeed>=2.4&&discSpeed<5.5){var ba=Math.atan2(disc.y-(h.basket.y+15),disc.x-h.basket.x);disc.x=h.basket.x+Math.cos(ba)*17;disc.y=h.basket.y+15+Math.sin(ba)*17;disc.vx=Math.cos(ba)*discSpeed*.32;disc.vy=Math.sin(ba)*discSpeed*.32;showToast('CHAIN OUT! TOO HOT')}
+      else if(discSpeed<.16){disc.moving=false;if(isOB(disc.x,disc.y,h)){strokes++;var edge=nearestLegalLie(disc.x,disc.y,h);disc.x=edge.x;disc.y=edge.y;lastLie={x:edge.x,y:edge.y};trail=[];showToast('OB · +1 · EDGE LIE')}else{lastLie={x:disc.x,y:disc.y};showToast('NEW LIE')}updateUI()}}}
+    draw();anim=requestAnimationFrame(tick)}
+  function pointerPos(e){var r=canvas.getBoundingClientRect(),p=e.touches?e.touches[0]:e;return{x:(p.clientX-r.left)*W/r.width,y:(p.clientY-r.top)*H/r.height}}
+  function down(e){if(finished)return;if(disc.moving){showToast('WAIT FOR DISC TO STOP');return}var p=pointerPos(e);if(Math.hypot(p.x-disc.x,p.y-disc.y)<58){dragging=true;dragX=p.x;dragY=p.y;wrap.setPointerCapture&&e.pointerId!=null&&wrap.setPointerCapture(e.pointerId);e.preventDefault()}else{showToast('TOUCH THE GLOWING DISC')}}
+  function move(e){if(!dragging)return;var p=pointerPos(e),dx=p.x-disc.x,dy=p.y-disc.y,m=Math.hypot(dx,dy);if(m>115){p.x=disc.x+dx/m*115;p.y=disc.y+dy/m*115}dragX=p.x;dragY=p.y;e.preventDefault()}
+  function up(e){if(!dragging)return;dragging=false;var dx=disc.x-dragX,dy=disc.y-dragY,m=Math.hypot(dx,dy);if(m<12){showToast('PULL BACK FARTHER');draw();return}var h=holes[holeIndex],tx=h.basket.x-disc.x,ty=h.basket.y+15-disc.y,aim=(dx*tx+dy*ty)/(m*Math.hypot(tx,ty));if(aim<-.15){showToast('PULL AWAY FROM THE BASKET');draw();return}var mult=DISCS[discType].mult;strokes++;lastLie={x:disc.x,y:disc.y};disc.vx=dx*mult;disc.vy=dy*mult;disc.moving=true;flightFrames=0;trail=[];updateUI();e.preventDefault()}
+  wrap.addEventListener('pointerdown',down);wrap.addEventListener('pointermove',move);wrap.addEventListener('pointerup',up);wrap.addEventListener('pointercancel',function(){if(dragging)showToast('THROW CANCELED');dragging=false});
+  canvas.addEventListener('keydown',function(e){if((e.key==='Enter'||e.key===' ')&&!disc.moving&&!finished){e.preventDefault();var h=holes[holeIndex],dx=h.basket.x-disc.x,dy=h.basket.y+15-disc.y,m=Math.hypot(dx,dy),power=Math.min(DISCS[discType].mult*105,Math.max(3.2,m*.020));strokes++;lastLie={x:disc.x,y:disc.y};disc.vx=dx/m*power;disc.vy=dy/m*power;disc.moving=true;flightFrames=0;trail=[];updateUI()}});
+  document.querySelectorAll('.biome-tab').forEach(function(b){b.addEventListener('click',function(){currentBiome=b.dataset.biome;palette=palettes[currentBiome];document.body.dataset.biome=currentBiome;document.querySelectorAll('.biome-tab').forEach(function(x){x.setAttribute('aria-selected',x===b?'true':'false')});document.getElementById('riverSwatch').style.background=palette.river;document.getElementById('pathSwatch').style.background=palette.path;document.getElementById('treeSwatch').style.background=palette.tree;document.getElementById('treeLabel').textContent=currentBiome==='desert'?'Cacti':currentBiome==='snow'?'Snowy trees':'Trees';draw()})});
+  document.querySelectorAll('.round-tab').forEach(function(b){b.addEventListener('click',function(){var nextLength=parseInt(b.dataset.length,10);if(nextLength===roundLength)return;roundLength=nextLength;document.querySelectorAll('.round-tab').forEach(function(x){x.setAttribute('aria-selected',x===b?'true':'false')});startCourse(seed||randomSeed());showToast(roundLength+'-HOLE ROUND READY')})});
+  function updateDiscInfo(){var D=DISCS[discType];document.getElementById('discInfo').innerHTML='<strong>'+D.label+' · '+D.nums+'</strong> — '+D.desc}
+  document.querySelectorAll('.disc-btn').forEach(function(b){b.addEventListener('click',function(){discType=b.dataset.disc;document.querySelectorAll('.disc-btn').forEach(function(x){x.setAttribute('aria-pressed',x===b?'true':'false')});updateDiscInfo();draw()})});
+  document.getElementById('newCourse').onclick=function(){startCourse(randomSeed())};document.getElementById('loadSeed').onclick=function(){startCourse(document.getElementById('seedInput').value)};document.getElementById('seedInput').addEventListener('keydown',function(e){if(e.key==='Enter')startCourse(this.value)});document.getElementById('resetHole').onclick=function(){loadHole()};
+  function renderScore(){var grid=document.getElementById('scoreGrid'),html='';var total=0,totalPar=0;for(var i=0;i<roundLength;i++){var sc=scores[i],p=holes[i].par;totalPar+=p;if(sc!=null)total+=sc;html+='<div class="score-cell"><span>HOLE '+(i+1)+' · P'+p+'</span><b>'+(sc==null?'—':sc)+'</b></div>'}var played=scores.filter(function(x){return x!=null}).length;var playedPar=holes.slice(0,played).reduce(function(a,h){return a+h.par},0),rel=total-playedPar;html+='<div class="score-cell total"><span>TOTAL</span><b>'+total+' '+(played?'('+(rel>0?'+':'')+rel+')':'')+'</b></div>';grid.innerHTML=html}
+  document.getElementById('scoreBtn').onclick=function(){renderScore();document.getElementById('scorePanel').classList.add('show')};document.getElementById('closeScore').onclick=function(){document.getElementById('scorePanel').classList.remove('show')};document.getElementById('scorePanel').addEventListener('click',function(e){if(e.target===this)this.classList.remove('show')});
+  document.getElementById('nextHole').onclick=function(){document.getElementById('resultOverlay').classList.remove('show');if(holeIndex<roundLength-1){holeIndex++;loadHole()}else{renderScore();document.getElementById('scorePanel').classList.add('show')}};
+  updateDiscInfo();startCourse(randomSeed());tick();
+})();
+</script>
+</body>
+</html>
